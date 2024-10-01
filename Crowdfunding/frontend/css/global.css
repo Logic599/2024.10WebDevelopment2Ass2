@@ -1,0 +1,86 @@
+/* omg, these are just some simple CSS form data */
+/* Because we cannot use frameworks, I can only do some minimal optimizations, as we are pressed for time! */
+
+body, html {
+    height: 100%;
+    width: 100%;
+    background-color: #eaeaea;
+}
+* {
+    margin: 0;
+    padding: 0;
+}
+.page-wrapper {
+    height: 100%;
+}
+.page-header{
+    height: 50px;
+    line-height: 50px;
+    display: flex;
+    align-items: center;
+    background-color: #00a59e;
+}
+.page-header .system-title {
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size: 20px;
+    margin-right: 50px;
+    padding: 0 30px;
+}
+.page-header .m-list {
+    display: flex;
+    align-items: center;
+}
+.page-header .m-i {
+    color: #333333;
+    margin-right: 30px;
+}
+.page-header .m-i a {
+    text-decoration: none;
+}
+.page-header .m-i a:hover {
+    color: #ff9f9f;
+}
+.page-content {
+    padding: 30px;
+}
+.select-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+.select-wrapper select {
+    margin: 10px 30px;
+    width: 200px;
+}
+.table-control{
+    border-collapse: collapse;
+    width: 100%;
+}
+.table-control thead {
+    background-color: #FFFFFF;
+}
+#empty{
+    color: #FF0000;
+    font-weight: bold;
+    display: none;
+    margin: 30px;
+}
+button {
+    background-color: #00a59e;
+    color: #FFFFFF;
+    outline: none;
+    padding: 5px 10px;
+    border: 1px solid #333333;
+    border-radius: 5px;
+    cursor: pointer;
+}
+select{
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.view-btn a{
+    text-decoration: none;
+    color: #ffffff;
+}

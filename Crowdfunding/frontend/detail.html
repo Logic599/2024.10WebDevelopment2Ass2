@@ -1,0 +1,92 @@
+<!doctype html>
+<!--declares the document type as HTML and...-->
+<!--defines the root element of the HTML document and sets the language attribute to English-->
+<html lang="en">
+<head>
+    <!--Set up a bunch of complex but necessary data. Do I need to explain each one ?-->
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Details of Fundraiser</title>
+    <!--Links an external stylesheet file named "global.css" to define the page's styling-->
+        <link rel="stylesheet" href="css/global.css">
+    </head>
+<body>
+    <!--Wraps the entire page content within a container with the class "page-wrapper", I will skip similar tasks next-->
+    <div class="page-wrapper">
+        <header class="page-header">
+            <div class="system-title">CrowdFunding System</div>
+            <div class="m-list">
+                <!--Defines a navigation menu within a div with the class "m-list", The "Home" and "Fundraiser" buttons below are navigation buttons-->
+                <div class="m-i">
+                    <a href="./index.html">Home</a>
+                </div>
+                <div class="m-i">
+                    <a href="./fundraiser.html">Fundraiser</a>
+                </div>
+            </div>
+        </header>
+        <main class="page-content">
+            <!--Creates a table element with various class attributes for styling and data display-->
+            <!--In other words, every item of data that needs to be displayed-->
+            <table border="1" class="table-control" cellpadding="2">
+                <tr>
+                    <td>Caption</td>
+                    <!--Table rows (<tr>) and cells (<td>) contain labels for "Caption," "Organizer," etc., and placeholders (<i>) with IDs where data will be inserted using JavaScript.-->
+                    <td><i id="caption"></i></td>
+                </tr>
+                <tr>
+                    <td>Organizer</td>
+                    <td><i id="organizer"></i></td>
+                </tr>
+                <tr>
+                    <td>Category</td>
+                    <td><i id="category"></i></td>
+                </tr>
+                <tr>
+                    <td>City</td>
+                    <td><i id="city"></i></td>
+                </tr>
+                <tr>
+                    <td>Target Funding</td>
+                    <td><i id="target-funding"></i></td>
+                </tr>
+                <tr>
+                    <td>Current Funding</td>
+                    <td><i id="current-funding"></i></td>
+                </tr>
+                <!--According to the document requirements, when the user clicks the donation button
+        inform them that the secondary function is not yet completed :) -->
+                <tr align="center">
+                    <td colspan="2">
+                        <button onclick="alert('According to the boss request, this feature is under construction');">Donation</button>
+                    </td>
+                </tr>
+            </table>
+        </main>
+    </div>
+</body>
+    <script src="js/req.js"></script>
+    <script>
+        //defines a function selectDetail that retrieves data using a requestGet function (in "api.js") based on the fundraiser_id extracted from the api.
+        //Then, it fills the gaps in the page table with the retrieved data
+        selectDetail();
+        function selectDetail() {
+            //Using the requestGet method to retrieve data, This method is defined in the req.js file
+            requestGet('/selectDetail', {
+                fundraiser_id: Number(location.href.split('=')[1])
+            }).then(data => {
+                //Here, I use the getElementById() method of the Document interface to return an Element object representing an element whose id property matches the specified string.
+                //Since the ID of an element must be unique when specified, this is an effective method for quickly accessing specific elements.
+                //In fact, this reflects that when my code retrieves data, it retrieves individual items rather than the entire data
+                document.getElementById('caption').innerHTML = data.caption;
+                document.getElementById('organizer').innerHTML = data.organizer;
+                document.getElementById('category').innerHTML = data.name;
+                document.getElementById('city').innerHTML = data.city;
+                document.getElementById('current-funding').innerHTML = data.current_funding;
+                document.getElementById('target-funding').innerHTML = data.target_funding;
+            });
+        }
+    </script>
+</html>

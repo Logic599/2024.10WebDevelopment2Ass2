@@ -1,0 +1,205 @@
+<!doctype html>
+<!--declares the document type as HTML and...-->
+<!--defines the root element of the HTML document and sets the language attribute to English-->
+<html lang="en">
+<head>
+    <!--Set up a bunch of complex but necessary data-->
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>List of Fundraiser</title>
+    <!--Links an external stylesheet file named "global.css" to define the page's styling-->
+    <link rel="stylesheet" href="css/global.css">
+</head>
+<body>
+    <!--Wraps the entire page content within a container with the class "page-wrapper", I will skip similar tasks next-->
+    <div class="page-wrapper">
+        <header class="page-header">
+            <div class="system-title">CrowdFunding System</div>
+            <div class="m-list">
+                <!--Defines a navigation menu within a div with the class "m-list", The "Home" and "Fundraiser" buttons below are navigation buttons-->
+                <div class="m-i">
+                    <a href="./index.html">Home</a>
+                </div>
+                <div class="m-i">
+                    <a href="./fundraiser.html">Fundraiser</a>
+                </div>
+            </div>
+        </header>
+        <main class="page-content">
+            <!--Creates a table element with various class attributes for styling and data display-->
+            <!--In other words, every item of data that needs to be displayed-->
+            <!--Similar to the "Details" page, but using a different form style for display,
+        in order to achieve the effect of being able to search for specific activities-->
+            <div class="select-wrapper">
+                <!--defines a section of a webpage that allows users to filter data based on category, organizer, and city-->
+                <div>
+                    <!--These are the options you can choose from, and they must be available in the database to be displayed-->
+                    category: <select id="category"></select>
+                    <!--According to the important instructions from Mr. Viettrong Luong today(9.30),
+                I have changed the 'organizer' column to an input type. Now users can enter the name they want to search for-->
+                    organizer: <input id="organizer"></input>
+                    city: <select id="city"></select>
+                </div>
+                <div>
+                    <!--A button with the onclick attribute set to selectDataList() for triggering the search functionality-->
+                    <button onclick="selectDataList()">Search</button>
+                    <!--A button with the onclick attribute set to resetDataList() for resetting the filter inputs-->
+                    <button onclick="resetDataList()">Reset</button>
+                </div>
+            </div>
+            <table border="1" class="table-control" cellpadding="4">
+                <thead>
+                    <!--Define the title of each column in the form to make it more intuitive when outputting data later-->
+                    <tr>
+                        <th>Index</th>
+                        <th>Caption</th>
+                        <th>Organizer</th>
+                        <th>Category</th>
+                        <th>City</th>
+                        <th>Target Funding</th>
+                        <th>Current Funding</th>
+                        <th>Operation</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <!--If the name the user wants to search for is not in the database, it will display 'No Data'-->
+            <div id="empty">No Data</div>
+        </main>
+    </div>
+</body>
+<script src="js/req.js"></script>
+<script>
+    //define several Select methods to obtain data during page initialization for filling out actual tables on the page
+    selectDataList();
+    selectCategory();
+    selectOrganizer();
+    selectCity();
+    //defines functions that interact with the HTML elements and make AJAX requests(those get methods) to the server to retrieve and display data.
+    function selectDataList() {
+        //This function is triggered when the "Search" button is clicked., it retrieves the values from the category, organizer, and city input elements.
+        //It constructs a query object containing the selected values.
+        const categoryID = document.getElementById('category');
+        const organizer = document.getElementById('organizer');
+        const city = document.getElementById('city');
+        //Then the collected data, which are the ones selected (or inputted) by the user, will become the conditions for retrieving data
+        const params = {
+            category_id: categoryID.value || '',
+            organizer: organizer.value || '',
+            city: city.value || ''
+        };
+        //make AJAX requests to the server and return the retrieved data in the form of promises
+        requestGet('/selectData', params).then(data => {
+            //then method is used to handle the response from the server and call the renderData function with the retrieved data.
+            renderData(data);
+        });
+    }
+    //this function takes the retrieved data as an argument
+    function renderData(data) {
+        const tbodyDom = document.querySelector('tbody');
+        //frist, clears the table body (tbody) to remove any existing data
+        tbodyDom.innerHTML = '';
+        //If the retrieved data has elements (meaning there are results), 
+        //it creates table rows(<tr>) for each data item and populates them with the corresponding data using template literals.
+        if (!!data.length) {
+            document.getElementById('empty').style.display = 'none';
+            const nodes = [];
+            for (let i = 0; i < data.length; i++) {
+                const trTpl = document.createElement('tr');
+                trTpl.innerHTML = `
+                <td>${data[i].fundraiser_id}</td>
+                <td>${data[i].caption}</td>
+                <td>${data[i].organizer}</td>
+                <td>${data[i].name}</td>
+                <td>${data[i].city}</td>
+                <td>${data[i].target_funding}</td>
+                <td>${data[i].current_funding}</td>
+                <td>
+                    <button class="view-btn"><a href="./detail.html?fundraiser_id=${data[i].fundraiser_id}">View</a>
+                </button></td>
+            `;
+                nodes.push(trTpl);
+            }
+            //created rows are then appended to the table body
+            nodes.forEach(item => {
+                tbodyDom.appendChild(item);
+            });
+        } else {
+            //if there is no data, an error will be reported
+            document.getElementById('empty').style.display = 'block';
+        }
+    }
+    //just clearing all the data, it's not that complicated
+    function resetDataList() {
+        document.getElementById('category').value = '';
+        document.getElementById('organizer').value = '';
+        document.getElementById('city').value = '';
+        selectDataList();
+    }
+    //select category
+    function selectCategory() {
+        requestGet('/selectCategory').then(data => {
+            const defaultOption = document.createElement('option');
+            defaultOption.selected = true;
+            defaultOption.value = '';
+            defaultOption.innerHTML = 'please select';
+            const nodes = [defaultOption];
+            for (let i = 0; i < data.length; i++) {
+                const optionNode = document.createElement('option');
+                optionNode.innerHTML = data[i].name;
+                optionNode.value = data[i].category_id;
+                nodes.push(optionNode);
+            }
+            nodes.forEach(item => {
+                document.getElementById('category').appendChild(item);
+            });
+        });
+    }
+
+    //these functions are called to populate the category, organizer, and city select elements with data from the server
+    //they use the requestGet function to fetch the respective data from the server (e.g., /selectCategory, /selectOrganizer, /selectCity).
+    //the retrieved data is then used to create option elements and append them to the corresponding select elements.
+    //these selections are all based on this principle, using the methods set in req.js, call the data in the database through the API
+
+    //select organizer
+    function selectOrganizer() {
+        requestGet('/selectOrganizer').then(data => {
+            const defaultOption = document.createElement('option');
+            defaultOption.selected = true;
+            defaultOption.value = '';
+            defaultOption.innerHTML = 'please select';
+            const nodes = [defaultOption];
+            for (let i = 0; i < data.length; i++) {
+                const optionNode = document.createElement('option');
+                optionNode.innerHTML = data[i].organizer;
+                optionNode.value = data[i].organizer;
+                nodes.push(optionNode);
+            }
+            nodes.forEach(item => {
+                document.getElementById('organizer').appendChild(item);
+            });
+        });
+    }
+    //select city
+    function selectCity() {
+        requestGet('/selectCity').then(data => {
+            const defaultOption = document.createElement('option');
+            defaultOption.selected = true;
+            defaultOption.value = '';
+            defaultOption.innerHTML = 'please select';
+            const nodes = [defaultOption];
+            for (let i = 0; i < data.length; i++) {
+                const optionNode = document.createElement('option');
+                optionNode.innerText = data[i].city;
+                optionNode.value = data[i].city;
+                nodes.push(optionNode);
+            }
+            nodes.forEach(item => {
+                document.getElementById('city').appendChild(item);
+            });
+        });
+    }
+</script>
+</html>
